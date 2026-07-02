@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Priya AI - তোমার স্যাসি গার্লফ্রেন্ড</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .priya-glow { box-shadow: 0 0 60px -10px rgb(236 72 153); }
+  </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-pink-950 via-purple-950 to-black text-white flex items-center justify-center overflow-hidden">
+
+  <div class="absolute inset-0 bg-[radial-gradient(at_center,#ec489920_0%,transparent_70%)]"></div>
+
+  <div class="relative z-10 flex flex-col items-center w-full max-w-md px-6 py-8">
+    <div class="flex items-center gap-3 mb-12">
+      <div class="w-9 h-9 bg-pink-500 rounded-full flex items-center justify-center">
+        <i class="fas fa-heart text-white"></i>
+      </div>
+      <h1 class="text-4xl font-bold tracking-tighter">priya</h1>
+    </div>
+
+    <div class="relative mb-16">
+      <div id="avatar" onclick="toggleSession()" 
+           class="w-52 h-52 rounded-full bg-gradient-to-br from-pink-500 via-purple-500 to-violet-500 flex items-center justify-center priya-glow cursor-pointer transition-all">
+        <div class="w-40 h-40 bg-black/40 backdrop-blur-xl rounded-full flex items-center justify-center border border-white/30 overflow-hidden">
+          <img src="https://picsum.photos/id/1011/300/300" alt="Priya" 
+               class="w-36 h-36 rounded-full object-cover border-4 border-white/30">
+        </div>
+      </div>
+      <div id="status" class="absolute -bottom-4 left-1/2 -translate-x-1/2 px-6 py-1.5 bg-black/70 backdrop-blur-md rounded-full text-xs font-medium flex items-center gap-2 border border-pink-500/30">
+        <div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+        DISCONNECTED
+      </div>
+    </div>
+
+    <button onclick="toggleSession()" id="micBtn"
+            class="w-24 h-24 rounded-full flex items-center justify-center transition-all shadow-2xl bg-zinc-800 hover:bg-zinc-700">
+      <i id="micIcon" class="fas fa-power-off text-5xl text-zinc-400"></i>
+    </button>
+
+    <p id="hint" class="mt-4 text-sm text-zinc-400 font-medium tracking-widest">TAP TO START CONVERSATION</p>
+
+    <div id="transcript" class="mt-8 text-center text-pink-300 italic min-h-[60px] px-4"></div>
+
+    <div id="chat" class="mt-8 w-full max-h-48 overflow-y-auto text-sm space-y-3 px-4 text-zinc-300"></div>
+  </div>
+
+  <script>
+    let isOn = false;
+    let status = 'disconnected';
+
+    function updateStatus(newStatus) {
+      status = newStatus;
+      const statusEl = document.getElementById('status');
+      statusEl.innerHTML = `
+        <div class="w-2 h-2 rounded-full ${status === 'speaking' ? 'bg-pink-500 animate-pulse' : 'bg-emerald-400'}"></div>
+        ${status.toUpperCase()}
+      `;
+    }
+
+    function addMessage(msg) {
+      const chat = document.getElementById('chat');
+      const div = document.createElement('div');
+      div.className = "text-[13px] leading-relaxed";
+      div.textContent = msg;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+    }
+
+    function speak(text) {
+      updateStatus('speaking');
+      addMessage(`Priya: ${text}`);
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1.08;
+      utterance.pitch = 1.12;
+      utterance.lang = 'en-US';
+      utterance.onend = () => updateStatus('idle');
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function toggleSession() {
+      const micBtn = document.getElementById('micBtn');
+      const micIcon = document.getElementById('micIcon');
+      const hint = document.getElementById('hint');
+
+      if (!isOn) {
+        isOn = true;
+        micBtn.className = "w-24 h-24 rounded-full flex items-center justify-center transition-all shadow-2xl bg-gradient-to-br from-pink-600 to-rose-600 scale-110";
+        micIcon.className = "fas fa-microphone text-5xl text-white";
+        hint.textContent = "Priya is listening... 💕";
+        updateStatus('idle');
+        
+        setTimeout(() => {
+          speak("Heyy baby... Priya here. Ki khobor? Ami tomake miss korchilam 💕");
+        }, 600);
+      } else {
+        isOn = false;
+        micBtn.className = "w-24 h-24 rounded-full flex items-center justify-center transition-all shadow-2xl bg-zinc-800 hover:bg-zinc-700";
+        micIcon.className = "fas fa-power-off text-5xl text-zinc-400";
+        hint.textContent = "TAP TO START";
+        updateStatus('disconnected');
+        window.speechSynthesis.cancel();
+      }
+    }
+
+    setInterval(() => {
+      if (isOn && status === 'idle' && Math.random() > 0.65) {
+        const replies = ["Tumi eto cute keno? 😏", "Ki korcho ekhon?", "Ami tomake miss korchi 🔥", "Bol na... ki khobor?"];
+        speak(replies[Math.floor(Math.random() * replies.length)]);
+      }
+    }, 15000);
+  </script>
+</body>
+</html>
